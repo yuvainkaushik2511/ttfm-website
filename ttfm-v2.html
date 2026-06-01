@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TTFM — The True Fame Media | AI Infrastructure</title>
+<meta name="description" content="The True Fame Media builds intelligent AI systems, automation infrastructure, and business operating systems for the future of business. Mumbai, India.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050505;--bg2:#0B0B0B;
+  --chrome:#B8BCC4;--chrome-bright:#E8EBF0;--chrome-dim:#72767E;
+  --blue:#7EE7FF;--blue-dim:rgba(126,231,255,0.12);--blue-glow:rgba(126,231,255,0.06);
+  --glass:rgba(255,255,255,0.03);--glass-border:rgba(255,255,255,0.07);
+  --text-muted:rgba(255,255,255,0.38);--text-dim:rgba(255,255,255,0.18);
+}
+html{scroll-behavior:auto;overflow-x:hidden}
+body{background:#050505;color:#fff;font-family:'DM Sans',sans-serif;font-weight:300;cursor:none;overflow-x:hidden}
+
+/* ─── CURSOR ─── */
+#cur{position:fixed;width:10px;height:10px;background:#fff;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .25s,height .25s}
+#cur-ring{position:fixed;width:38px;height:38px;border:1px solid rgba(255,255,255,0.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .4s cubic-bezier(.23,1,.32,1),height .4s cubic-bezier(.23,1,.32,1),border-color .3s}
+#cur-trail{position:fixed;pointer-events:none;z-index:9997;width:6px;height:6px;border-radius:50%;background:rgba(126,231,255,0.5);transform:translate(-50%,-50%);opacity:0;transition:opacity .3s}
+
+/* ─── LOADER ─── */
+#loader{position:fixed;inset:0;background:#000;z-index:9990;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+#ldr-canvas{position:absolute;inset:0}
+#ldr-logo{position:relative;z-index:2;font-family:'Syne',sans-serif;font-size:clamp(52px,9vw,104px);font-weight:800;letter-spacing:.22em;color:transparent;background:linear-gradient(135deg,#666 0%,#e0e0e0 30%,#fff 50%,#ccc 70%,#888 100%);-webkit-background-clip:text;background-clip:text;opacity:0;transform:scale(.75) translateY(20px)}
+#ldr-tag{position:relative;z-index:2;font-family:'DM Sans',sans-serif;font-size:clamp(10px,1.1vw,13px);letter-spacing:.45em;color:rgba(255,255,255,.35);text-transform:uppercase;margin-top:20px;opacity:0}
+#ldr-status{position:absolute;bottom:56px;text-align:center}
+#ldr-prog-wrap{width:180px;height:1px;background:rgba(255,255,255,.06);overflow:hidden;margin:0 auto}
+#ldr-prog{height:100%;background:linear-gradient(90deg,transparent,#7EE7FF,#fff,transparent);width:0%;transition:width .08s linear}
+#ldr-pct{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.3em;color:rgba(255,255,255,.2);margin-top:10px;text-align:center}
+
+/* ─── NAV ─── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:22px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,5,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.04);opacity:0;transform:translateY(-100%);transition:background .4s}
+nav.scrolled{background:rgba(5,5,5,.95)}
+.nav-logo{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;letter-spacing:.18em;color:transparent;background:linear-gradient(120deg,#888,#fff,#999);-webkit-background-clip:text;background-clip:text;text-decoration:none}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.38);text-decoration:none;transition:color .3s;font-family:'Space Mono',monospace;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--blue);transition:width .3s}
+.nav-links a:hover{color:#fff}
+.nav-links a:hover::after{width:100%}
+.nav-cta{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#050505;background:linear-gradient(135deg,#c0c4cc,#e8ebf0,#b8bcc4);padding:11px 26px;border:none;cursor:pointer;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);position:relative;overflow:hidden;transition:opacity .3s}
+.nav-cta::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transition:left .5s}
+.nav-cta:hover::before{left:100%}
+.nav-cta:hover{opacity:.85}
+
+/* ─── HERO ─── */
+#hero{position:relative;height:100vh;min-height:700px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+#hero-canvas{position:absolute;inset:0;z-index:0}
+.hero-scan-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(126,231,255,.15),transparent);animation:scanDown 8s ease-in-out infinite;z-index:1;pointer-events:none}
+@keyframes scanDown{0%{top:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+.hero-content{position:relative;z-index:2;text-align:center;max-width:960px;padding:0 48px}
+.hero-eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.55em;color:rgba(255,255,255,.25);text-transform:uppercase;margin-bottom:36px;opacity:0;display:flex;align-items:center;justify-content:center;gap:16px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:40px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2))}
+.hero-eyebrow::after{background:linear-gradient(90deg,rgba(255,255,255,.2),transparent)}
+.hero-title{font-family:'Syne',sans-serif;font-size:clamp(36px,6.2vw,84px);font-weight:800;line-height:1.0;letter-spacing:-.025em;opacity:0;transform:translateY(48px)}
+.hero-title .line-chrome{color:transparent;background:linear-gradient(135deg,#6a6e76 0%,#d8dbe0 28%,#fff 50%,#c8ccd4 72%,#888c94 100%);-webkit-background-clip:text;background-clip:text;display:block}
+.hero-title .line-outline{-webkit-text-stroke:1px rgba(255,255,255,.22);color:transparent;display:block}
+.hero-sub{font-family:'DM Sans',sans-serif;font-size:clamp(11px,1.2vw,14px);letter-spacing:.35em;color:rgba(255,255,255,.28);text-transform:uppercase;margin-top:28px;opacity:0;line-height:2}
+.hero-sub span{color:var(--blue);opacity:.7}
+.hero-actions{display:flex;gap:16px;justify-content:center;margin-top:48px;opacity:0;flex-wrap:wrap}
+
+/* ─── BUTTONS ─── */
+.btn-primary{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#050505;background:linear-gradient(135deg,#b8bcc4,#e8ebf0,#c0c4cc);padding:15px 38px;border:none;cursor:pointer;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);position:relative;overflow:hidden;transition:transform .2s}
+.btn-primary::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);transform:translateX(-100%);transition:transform .5s}
+.btn-primary:hover{transform:scale(1.02)}
+.btn-primary:hover::after{transform:translateX(100%)}
+.btn-ghost{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.55);background:transparent;padding:15px 38px;border:1px solid rgba(255,255,255,.12);cursor:pointer;transition:border-color .3s,color .3s,background .3s}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
+.btn-blue{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#050505;background:linear-gradient(135deg,#5dd4f0,#7EE7FF,#6cd8f5);padding:15px 38px;border:none;cursor:pointer;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);transition:opacity .3s,transform .2s;position:relative;overflow:hidden}
+.btn-blue::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transform:translateX(-100%);transition:transform .5s}
+.btn-blue:hover{opacity:.9;transform:scale(1.02)}
+.btn-blue:hover::after{transform:translateX(100%)}
+
+/* ─── SCROLL IND ─── */
+#scroll-ind{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;z-index:2}
+#scroll-ind span{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.35em;color:rgba(255,255,255,.2);text-transform:uppercase}
+.scroll-line{width:1px;height:44px;background:linear-gradient(180deg,rgba(126,231,255,.4),transparent);animation:sline 2.2s ease-in-out infinite}
+@keyframes sline{0%,100%{opacity:.3;transform:scaleY(1)}50%{opacity:1;transform:scaleY(.5)}}
+
+/* ─── SECTION STRUCTURE ─── */
+section{position:relative;padding:140px 0;overflow:hidden}
+.section-inner{max-width:1200px;margin:0 auto;padding:0 64px}
+.section-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent)}
+.section-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.55em;color:rgba(255,255,255,.2);text-transform:uppercase;margin-bottom:20px;display:block}
+.section-h{font-family:'Syne',sans-serif;font-size:clamp(30px,3.8vw,54px);font-weight:700;line-height:1.1;letter-spacing:-.02em}
+.chrome-h{color:transparent;background:linear-gradient(135deg,#888c94,#e0e4ec,#b8bcc4);-webkit-background-clip:text;background-clip:text}
+.blue-accent{color:var(--blue)}
+.chrome-line{width:48px;height:1px;background:linear-gradient(90deg,var(--blue),rgba(255,255,255,.3),transparent);margin:20px 0}
+
+/* ─── VISION / MANIFESTO ─── */
+#vision{background:#050505;padding:160px 0}
+.vision-grid{display:grid;grid-template-columns:1fr 1fr;gap:120px;align-items:center}
+.vision-ghost{font-family:'Syne',sans-serif;font-size:clamp(100px,15vw,220px);font-weight:800;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.04);line-height:.85;user-select:none;pointer-events:none}
+.vision-body-text{font-size:17px;line-height:1.9;color:rgba(255,255,255,.38);max-width:480px;margin-top:24px}
+.vision-stat-row{display:flex;gap:48px;margin-top:56px}
+.vision-stat-val{font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--blue);display:block;line-height:1}
+.vision-stat-lbl{font-size:12px;color:rgba(255,255,255,.28);margin-top:6px;letter-spacing:.05em}
+
+/* ─── SERVICES ─── */
+#services{background:#0B0B0B}
+.services-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:72px}
+.services-header p{font-size:14px;color:rgba(255,255,255,.3);max-width:320px;line-height:1.7;text-align:right}
+.infra-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.05)}
+.infra-card{background:#0B0B0B;padding:44px 36px 56px;position:relative;overflow:hidden;cursor:default;transition:background .5s}
+.infra-card:hover{background:rgba(15,15,18,1)}
+.infra-card-glow{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);transform:scaleX(0);transition:transform .6s cubic-bezier(.23,1,.32,1);transform-origin:left}
+.infra-card:hover .infra-card-glow{transform:scaleX(1)}
+.infra-card-num{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.4em;color:rgba(255,255,255,.15);margin-bottom:28px}
+.infra-card-icon{width:48px;height:48px;margin-bottom:24px;position:relative}
+.infra-card-icon svg{width:100%;height:100%}
+.infra-card-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:14px;line-height:1.2}
+.infra-card-desc{font-size:13px;line-height:1.75;color:rgba(255,255,255,.32)}
+.infra-card-neural{position:absolute;bottom:0;left:0;right:0;height:80px;opacity:0;transition:opacity .5s}
+.infra-card:hover .infra-card-neural{opacity:1}
+.infra-card-tag{position:absolute;bottom:20px;right:20px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.3em;color:var(--blue);opacity:0;transition:opacity .4s}
+.infra-card:hover .infra-card-tag{opacity:.6}
+
+/* ─── DIGITAL WORKFORCE ─── */
+#workforce{background:#050505;padding:160px 0}
+.workforce-layout{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.employee-list{margin-top:48px;display:flex;flex-direction:column;gap:0}
+.employee-row{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:20px;padding:22px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:default;transition:padding-left .3s,background .3s;position:relative;overflow:hidden}
+.employee-row:first-child{border-top:1px solid rgba(255,255,255,.05)}
+.employee-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue);transform:scaleY(0);transition:transform .3s;transform-origin:bottom}
+.employee-row:hover{padding-left:12px}
+.employee-row:hover::before{transform:scaleY(1)}
+.emp-id{font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,.15);letter-spacing:.2em}
+.emp-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:600}
+.emp-role{font-size:12px;color:rgba(255,255,255,.3);margin-top:3px}
+.emp-status{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.2em;color:var(--blue);opacity:.5;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.emp-status::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--blue);animation:statusPulse 2s ease-in-out infinite}
+@keyframes statusPulse{0%,100%{opacity:.4}50%{opacity:1}}
+.neural-viz{position:relative;height:480px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.01);overflow:hidden}
+.neural-viz-label{position:absolute;top:16px;left:16px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.3em;color:rgba(255,255,255,.18);z-index:2}
+#neural-canvas{position:absolute;inset:0;width:100%;height:100%}
+
+/* ─── BUSINESS OS ─── */
+#bos{background:#0B0B0B;padding:160px 0}
+.bos-title-wrap{text-align:center;margin-bottom:100px}
+.bos-flow{display:flex;flex-direction:column;align-items:center;gap:0;max-width:680px;margin:0 auto;position:relative}
+.bos-flow::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.08) 10%,rgba(255,255,255,.08) 90%,transparent);transform:translateX(-50%)}
+.bos-step{display:grid;grid-template-columns:1fr 56px 1fr;gap:0;align-items:center;width:100%;margin-bottom:0;opacity:0;transform:translateY(20px);transition:none}
+.bos-step.visible{animation:bosStepIn .7s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes bosStepIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.bos-step-left,.bos-step-right{padding:28px 32px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);position:relative;overflow:hidden}
+.bos-step-left{border-right:none;text-align:right}
+.bos-step-right{border-left:none}
+.bos-step-mid{display:flex;align-items:center;justify-content:center;z-index:2;position:relative}
+.bos-node{width:44px;height:44px;border-radius:50%;background:#0B0B0B;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,.25);position:relative}
+.bos-node.active{border-color:var(--blue);color:var(--blue)}
+.bos-node.active::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(126,231,255,.2);animation:bosNodePulse 2s ease-in-out infinite}
+@keyframes bosNodePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:0}}
+.bos-step-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;margin-bottom:6px}
+.bos-step-desc{font-size:12px;color:rgba(255,255,255,.28);line-height:1.6}
+.bos-step-event{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.25em;color:var(--blue);opacity:.5;margin-bottom:8px;text-transform:uppercase}
+.bos-step:nth-child(even) .bos-step-left{background:transparent;border-color:transparent}
+.bos-step:nth-child(even) .bos-step-right{background:rgba(126,231,255,.03);border-color:rgba(126,231,255,.08)}
+
+/* ─── PROCESS ─── */
+#process{background:#050505;padding:140px 0}
+.process-track{display:grid;grid-template-columns:repeat(5,1fr);position:relative;margin-top:80px;gap:0}
+.process-track::before{content:'';position:absolute;top:22px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07) 10%,rgba(255,255,255,.07) 90%,transparent)}
+.process-step{padding:0 20px}
+.process-num{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#050505;border:1px solid rgba(255,255,255,.1);font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,.3);margin-bottom:24px;position:relative;z-index:1;transition:border-color .3s,color .3s}
+.process-step:hover .process-num{border-color:var(--blue);color:var(--blue)}
+.process-step-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;margin-bottom:10px}
+.process-step-desc{font-size:12px;line-height:1.7;color:rgba(255,255,255,.28)}
+
+/* ─── AI CHAT DEMO ─── */
+#ai-demo{background:#0B0B0B;padding:160px 0}
+.demo-layout{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.demo-left h2{margin-bottom:20px}
+.demo-left p{font-size:15px;line-height:1.8;color:rgba(255,255,255,.35);margin-bottom:36px}
+.demo-features{display:flex;flex-direction:column;gap:16px;margin-bottom:40px}
+.demo-feat{display:flex;align-items:center;gap:14px;font-size:13px;color:rgba(255,255,255,.4)}
+.demo-feat-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.chat-widget{border:1px solid rgba(255,255,255,.07);background:#050505;overflow:hidden}
+.chat-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:12px}
+.chat-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1a3a4a,#2a5a6a);border:1px solid rgba(126,231,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--blue);font-family:'Space Mono',monospace}
+.chat-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:600}
+.chat-status-line{font-size:11px;color:rgba(255,255,255,.25);display:flex;align-items:center;gap:5px}
+.chat-online{width:5px;height:5px;border-radius:50%;background:#4ade80;animation:statusPulse 2s infinite}
+.chat-msgs{padding:20px;display:flex;flex-direction:column;gap:14px;min-height:280px;max-height:280px;overflow-y:auto}
+.chat-msgs::-webkit-scrollbar{width:2px}
+.chat-msgs::-webkit-scrollbar-track{background:transparent}
+.chat-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+.msg-ai,.msg-user{max-width:80%;padding:11px 15px;font-size:13px;line-height:1.6}
+.msg-ai{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.8);align-self:flex-start;border-radius:0 8px 8px 8px}
+.msg-user{background:rgba(126,231,255,.08);border:1px solid rgba(126,231,255,.12);color:rgba(255,255,255,.85);align-self:flex-end;border-radius:8px 0 8px 8px}
+.msg-typing{display:flex;gap:4px;align-items:center;padding:14px 18px}
+.msg-typing span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.25)}
+.msg-typing span:nth-child(1){animation:dot 1.2s .0s infinite}
+.msg-typing span:nth-child(2){animation:dot 1.2s .2s infinite}
+.msg-typing span:nth-child(3){animation:dot 1.2s .4s infinite}
+@keyframes dot{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+.chat-input-row{padding:14px 16px;border-top:1px solid rgba(255,255,255,.05);display:flex;gap:10px}
+#chat-input{flex:1;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);color:#fff;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .3s}
+#chat-input:focus{border-color:rgba(126,231,255,.3)}
+#chat-input::placeholder{color:rgba(255,255,255,.2)}
+#chat-send{background:linear-gradient(135deg,#5dd4f0,#7EE7FF);border:none;color:#050505;width:38px;height:38px;cursor:pointer;font-family:'Space Mono',monospace;font-size:16px;display:flex;align-items:center;justify-content:center;transition:opacity .3s;flex-shrink:0}
+#chat-send:hover{opacity:.8}
+
+/* ─── DIGITAL VAULT ─── */
+#vault{background:#050505;padding:160px 0}
+.vault-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:72px}
+.vault-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.04)}
+.vault-card{background:#050505;position:relative;overflow:hidden;aspect-ratio:1/1;cursor:pointer;transition:background .4s}
+.vault-card:hover{background:#0d0d0d}
+.vault-card-bg{position:absolute;inset:0;opacity:.06;transition:opacity .5s}
+.vault-card:hover .vault-card-bg{opacity:.14}
+.vault-card-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:32px 32px;transition:opacity .4s}
+.vault-card:hover .vault-card-grid{opacity:0}
+.vault-card-content{position:absolute;inset:0;padding:32px;display:flex;flex-direction:column;justify-content:flex-end}
+.vault-card-num{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.4em;color:rgba(255,255,255,.2);margin-bottom:auto}
+.vault-card-tag{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.3em;color:var(--blue);opacity:0;text-transform:uppercase;margin-bottom:8px;transition:opacity .4s}
+.vault-card:hover .vault-card-tag{opacity:.6}
+.vault-card-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px;line-height:1.2}
+.vault-card-sub{font-size:12px;color:rgba(255,255,255,.3);transition:color .3s}
+.vault-card:hover .vault-card-sub{color:rgba(255,255,255,.5)}
+.vault-card-canvas{position:absolute;inset:0;opacity:0;transition:opacity .5s}
+.vault-card:hover .vault-card-canvas{opacity:1}
+
+/* ─── CTA ─── */
+#cta-section{background:#050505;padding:200px 0;text-align:center;position:relative;overflow:hidden}
+#cta-canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.35}
+.cta-inner{position:relative;z-index:1;padding:0 48px}
+.cta-eyebrow{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.55em;color:rgba(255,255,255,.18);text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:12px}
+.cta-eyebrow::before,.cta-eyebrow::after{content:'';flex:1;max-width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1))}
+.cta-eyebrow::after{background:linear-gradient(90deg,rgba(255,255,255,.1),transparent)}
+.cta-title{font-family:'Syne',sans-serif;font-size:clamp(34px,5.5vw,76px);font-weight:800;line-height:1.06;letter-spacing:-.03em;max-width:820px;margin:0 auto 20px}
+.cta-title .cline1{color:transparent;background:linear-gradient(135deg,#888,#e8ebf0,#b0b4bc);-webkit-background-clip:text;background-clip:text;display:block}
+.cta-title .cline2{display:block}
+.cta-sub{font-size:15px;color:rgba(255,255,255,.28);margin-bottom:52px}
+.cta-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.cta-note{margin-top:32px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.3em;color:rgba(255,255,255,.12)}
+
+/* ─── FOOTER ─── */
+footer{background:#0B0B0B;padding:80px 0 44px;border-top:1px solid rgba(255,255,255,.05)}
+.footer-inner{max-width:1200px;margin:0 auto;padding:0 64px}
+.footer-top{display:grid;grid-template-columns:1fr auto;gap:80px;margin-bottom:72px;align-items:start}
+.footer-brand{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:.12em;color:transparent;background:linear-gradient(135deg,#666,#e8ebf0,#888);-webkit-background-clip:text;background-clip:text}
+.footer-tagline{font-size:13px;color:rgba(255,255,255,.22);margin-top:10px;max-width:260px;line-height:1.7}
+.footer-blue-line{width:36px;height:1px;background:var(--blue);margin:16px 0;opacity:.4}
+.footer-contact{font-size:13px;color:rgba(255,255,255,.3)}
+.footer-links{display:flex;gap:56px}
+.footer-col h4{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.45em;color:rgba(255,255,255,.18);text-transform:uppercase;margin-bottom:20px}
+.footer-col a{display:block;font-size:13px;color:rgba(255,255,255,.35);text-decoration:none;margin-bottom:10px;transition:color .3s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:28px;border-top:1px solid rgba(255,255,255,.04)}
+.footer-copy{font-size:11px;color:rgba(255,255,255,.18);font-family:'Space Mono',monospace;letter-spacing:.05em}
+.footer-loc{font-size:10px;color:rgba(255,255,255,.12);font-family:'Space Mono',monospace;letter-spacing:.22em;display:flex;align-items:center;gap:8px}
+.footer-loc::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--blue);opacity:.4}
+
+/* ─── REVEALS ─── */
+.reveal{opacity:0;transform:translateY(28px)}
+.reveal.visible{animation:revUp .85s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes revUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.reveal-fade{opacity:0}
+.reveal-fade.visible{animation:revFade .9s ease forwards}
+@keyframes revFade{from{opacity:0}to{opacity:1}}
+
+/* ─── NOISE ─── */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.022;pointer-events:none;z-index:9000}
+
+/* ─── MOBILE ─── */
+@media(max-width:900px){
+  nav{padding:18px 24px}
+  .nav-links{display:none}
+  .section-inner{padding:0 24px}
+  section{padding:100px 0}
+  .vision-grid,.agents-layout,.workforce-layout,.demo-layout{grid-template-columns:1fr;gap:48px}
+  .neural-viz{height:260px}
+  .infra-grid{grid-template-columns:1fr}
+  .process-track{grid-template-columns:1fr 1fr}
+  .vault-grid{grid-template-columns:1fr 1fr}
+  .footer-top{grid-template-columns:1fr;gap:40px}
+  .footer-links{flex-wrap:wrap;gap:32px}
+  .hero-content{padding:0 24px}
+  .bos-flow{padding:0 16px}
+  .bos-step{grid-template-columns:1fr 44px 1fr}
+  .numbers-grid{grid-template-columns:repeat(2,1fr)}
+  .vision-ghost{display:none}
+}
+@media(max-width:600px){
+  .infra-grid,.vault-grid{grid-template-columns:1fr}
+  .process-track{grid-template-columns:1fr}
+  .hero-title{font-size:clamp(34px,10vw,52px)}
+  .bos-step{grid-template-columns:1fr 36px 1fr;gap:0}
+  .bos-step-left,.bos-step-right{padding:18px 14px}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<div id="cur-trail"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <canvas id="ldr-canvas"></canvas>
+  <div id="ldr-logo">TTFM</div>
+  <div id="ldr-tag">The True Fame Media &nbsp;•&nbsp; Mumbai</div>
+  <div id="ldr-status">
+    <div id="ldr-prog-wrap"><div id="ldr-prog"></div></div>
+    <div id="ldr-pct">INITIALIZING SYSTEMS</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">TTFM</a>
+  <ul class="nav-links">
+    <li><a href="#vision">Vision</a></li>
+    <li><a href="#services">Infrastructure</a></li>
+    <li><a href="#workforce">Workforce</a></li>
+    <li><a href="#bos">OS</a></li>
+    <li><a href="#ai-demo">AI Demo</a></li>
+  </ul>
+  <button class="nav-cta" onclick="openModal()">Book Strategy Session</button>
+</nav>
+
+<!-- ─────────────── HERO ─────────────── -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-scan-line"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">The True Fame Media — Mumbai, India</div>
+    <h1 class="hero-title">
+      <span class="line-chrome">Building Intelligent</span>
+      <span class="line-outline">Systems For The</span>
+      <span class="line-chrome">Future Of Business</span>
+    </h1>
+    <div class="hero-sub">
+      AI Infrastructure <span>•</span> Digital Employees <span>•</span> Automation Systems <span>•</span> Media Intelligence
+    </div>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="openModal()">Explore The Future</button>
+      <button class="btn-blue" onclick="document.getElementById('ai-demo').scrollIntoView({behavior:'smooth'})">Talk To Our AI</button>
+      <button class="btn-ghost" onclick="openModal()">Book Strategy Session</button>
+    </div>
+  </div>
+  <div id="scroll-ind">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ─────────────── VISION ─────────────── -->
+<section id="vision">
+  <div class="section-inner">
+    <div class="vision-grid">
+      <div>
+        <span class="section-label reveal">01 — Future Infrastructure</span>
+        <div class="chrome-line reveal"></div>
+        <h2 class="section-h reveal" style="font-size:clamp(28px,3.5vw,50px);max-width:520px">We don't build websites.<br>We architect <em style="font-style:italic;font-weight:300;color:rgba(255,255,255,.4)">intelligent civilizations</em> for your business.</h2>
+        <p class="vision-body-text reveal">TTFM sits at the intersection of AI infrastructure, automation engineering, and cinematic media. Every system we deploy is designed to think, act, and scale — autonomously.</p>
+        <div class="vision-stat-row reveal">
+          <div>
+            <span class="vision-stat-val">10×</span>
+            <div class="vision-stat-lbl">Lead Response Speed</div>
+          </div>
+          <div>
+            <span class="vision-stat-val">24/7</span>
+            <div class="vision-stat-lbl">AI Agents Active</div>
+          </div>
+          <div>
+            <span class="vision-stat-val">∞</span>
+            <div class="vision-stat-lbl">Scalability</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center">
+        <div class="vision-ghost reveal-fade">AI</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ─────────────── SERVICES ─────────────── -->
+<section id="services">
+  <div class="section-inner">
+    <div class="services-header">
+      <div>
+        <span class="section-label reveal">02 — Digital Infrastructure</span>
+        <h2 class="section-h reveal">What We <span class="chrome-h">Build</span></h2>
+      </div>
+      <p class="reveal" style="font-size:14px;color:rgba(255,255,255,.28);max-width:280px;line-height:1.7;text-align:right">Six core systems that form the backbone of a modern intelligent business.</p>
+    </div>
+    <div class="infra-grid">
+
+      <div class="infra-card reveal">
+        <div class="infra-card-glow"></div>
+        <div class="infra-card-num">SYSTEM 01</div>
+        <div class="infra-card-icon">
+          <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><circle cx="24" cy="24" r="5" fill="rgba(126,231,255,0.3)"/><path d="M24 6v6M24 36v6M6 24h6M36 24h6" stroke="rgba(126,231,255,0.25)" stroke-width="1.2" stroke-linecap="round"/><circle cx="24" cy="24" r="11" stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="3 4"/></svg>
+        </div>
+        <div class="infra-card-title">Digital Employee</div>
+        <div class="infra-card-desc">An AI agent embedded in your website that qualifies leads, answers questions, and books appointments — 24/7, with zero overhead.</div>
+        <canvas class="infra-card-neural" data-neural></canvas>
+        <div class="infra-card-tag">Always Active</div>
+      </div>
+
+      <div class="infra-card reveal" style="animation-delay:.08s">
+        <div class="infra-card-glow"></div>
+        <div class="infra-card-num">SYSTEM 02</div>
+        <div class="infra-card-icon">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="10" y="10" width="28" height="28" rx="4" stroke="rgba(255,255,255,0.18)" stroke-width="1"/><path d="M17 24h14M24 17v14" stroke="rgba(126,231,255,0.3)" stroke-width="1.5" stroke-linecap="round"/><rect x="14" y="14" width="20" height="20" rx="2" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></svg>
+        </div>
+        <div class="infra-card-title">Communication Intelligence</div>
+        <div class="infra-card-desc">WhatsApp automation that handles lead nurturing, follow-ups, appointment confirmations and support — at unlimited scale.</div>
+        <canvas class="infra-card-neural" data-neural></canvas>
+        <div class="infra-card-tag">Instant Response</div>
+      </div>
+
+      <div class="infra-card reveal" style="animation-delay:.16s">
+        <div class="infra-card-glow"></div>
+        <div class="infra-card-num">SYSTEM 03</div>
+        <div class="infra-card-icon">
+          <svg viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="24" rx="16" ry="10" stroke="rgba(255,255,255,0.18)" stroke-width="1"/><circle cx="24" cy="24" r="3" fill="rgba(126,231,255,0.4)"/><path d="M15 24 Q24 14 33 24 Q24 34 15 24" stroke="rgba(126,231,255,0.12)" stroke-width="1.2"/></svg>
+        </div>
+        <div class="infra-card-title">Voice Infrastructure</div>
+        <div class="infra-card-desc">Human-sounding AI agents handling inbound and outbound calls — qualifying leads, scheduling meetings, and delivering perfect responses.</div>
+        <canvas class="infra-card-neural" data-neural></canvas>
+        <div class="infra-card-tag">Human Grade</div>
+      </div>
+
+      <div class="infra-card reveal">
+        <div class="infra-card-glow"></div>
+        <div class="infra-card-num">SYSTEM 04</div>
+        <div class="infra-card-icon">
+          <svg viewBox="0 0 48 48" fill="none"><path d="M10 36 L10 22 L18 14 L24 20 L30 10 L38 8" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" stroke-linecap="round"/><circle cx="38" cy="8" r="3" fill="rgba(126,231,255,0.4)"/><path d="M10 42 L38 42" stroke="rgba(255,255,255,0.07)" stroke-width="1"/></svg>
+        </div>
+        <div class="infra-card-title">Revenue Systems</div>
+        <div class="infra-card-desc">End-to-end automated lead capture, scoring, routing and nurturing pipelines built to generate consistent, high-quality inbound revenue.</div>
+        <canvas class="infra-card-neural" data-neural></canvas>
+        <div class="infra-card-tag">Revenue Focused</div>
+      </div>
+
+      <div class="infra-card reveal" style="animation-delay:.08s">
+        <div class="infra-card-glow"></div>
+        <div class="infra-card-num">SYSTEM 05</div>
+        <div class="infra-card-icon">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="8" y="16" width="14" height="14" rx="2" stroke="rgba(255,255,255,0.18)" stroke-width="1"/><rect x="26" y="16" width="14" height="14" rx="2" stroke="rgba(255,255,255,0.18)" stroke-width="1"/><path d="M22 23 L26 23" stroke="rgba(126,231,255,0.3)" stroke-width="1.2"/><path d="M15 10 L15 16M33 10 L33 16M15 30 L15 36M33 30 L33 36" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></svg>
+        </div>
+        <div class="infra-card-title">Business Operating System</div>
+        <div class="infra-card-desc">CRM automation, appointment booking, client follow-ups and complete workflow orchestration — the nervous system of a modern business.</div>
+        <canvas class="infra-card-neural" data-neural></canvas>
+        <div class="infra-card-tag">Full Automation</div>
+      </div>
+
+      <div class="infra-card reveal" style="animation-delay:.16s">
+        <div class="infra-card-glow"></div>
+        <div class="infra-card-num">SYSTEM 06</div>
+        <div class="infra-card-icon">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="12" height="12" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><rect x="28" y="8" width="12" height="12" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><rect x="8" y="28" width="12" height="12" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><rect x="28" y="28" width="12" height="12" stroke="rgba(126,231,255,0.3)" stroke-width="1"/></svg>
+        </div>
+        <div class="infra-card-title">Custom Intelligence Platforms</div>
+        <div class="infra-card-desc">Bespoke AI-powered platforms and dashboards built for your specific operational reality — from data pipelines to decision intelligence systems.</div>
+        <canvas class="infra-card-neural" data-neural></canvas>
+        <div class="infra-card-tag">Custom Built</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ─────────────── DIGITAL WORKFORCE ─────────────── -->
+<section id="workforce">
+  <div class="section-inner">
+    <div class="workforce-layout">
+      <div>
+        <span class="section-label reveal">03 — Digital Workforce</span>
+        <h2 class="section-h reveal">Your AI Employees,<br><span class="chrome-h">Always On Duty</span></h2>
+        <p style="font-size:15px;line-height:1.85;color:rgba(255,255,255,.35);margin-top:20px;max-width:440px" class="reveal">Five specialized AI agents deployed across every touchpoint of your business. They never sleep, never miss a lead, and never stop performing.</p>
+        <div class="chrome-line reveal"></div>
+        <div class="employee-list reveal">
+          <div class="employee-row">
+            <div class="emp-id">E-01</div>
+            <div><div class="emp-name">Website Intelligence</div><div class="emp-role">Website AI Agent • Lead Qualification</div></div>
+            <div class="emp-status">Online</div>
+          </div>
+          <div class="employee-row" style="animation-delay:.08s">
+            <div class="emp-id">E-02</div>
+            <div><div class="emp-name">WhatsApp Intelligence</div><div class="emp-role">Messaging Automation • Follow-ups</div></div>
+            <div class="emp-status">Online</div>
+          </div>
+          <div class="employee-row" style="animation-delay:.12s">
+            <div class="emp-id">E-03</div>
+            <div><div class="emp-name">Voice Intelligence</div><div class="emp-role">Call Handling • Appointment Booking</div></div>
+            <div class="emp-status">Online</div>
+          </div>
+          <div class="employee-row" style="animation-delay:.16s">
+            <div class="emp-id">E-04</div>
+            <div><div class="emp-name">Knowledge Intelligence</div><div class="emp-role">Knowledge Base • Deep Context</div></div>
+            <div class="emp-status">Online</div>
+          </div>
+          <div class="employee-row" style="animation-delay:.2s">
+            <div class="emp-id">E-05</div>
+            <div><div class="emp-name">Revenue Intelligence</div><div class="emp-role">Lead Scoring • Pipeline Management</div></div>
+            <div class="emp-status">Online</div>
+          </div>
+        </div>
+      </div>
+      <div class="neural-viz reveal-fade">
+        <div class="neural-viz-label">Neural Network — Live</div>
+        <canvas id="neural-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ─────────────── BUSINESS OS ─────────────── -->
+<section id="bos">
+  <div class="section-inner">
+    <div class="bos-title-wrap">
+      <span class="section-label reveal" style="text-align:center;display:block">04 — Business Operating System</span>
+      <h2 class="section-h reveal" style="text-align:center;max-width:600px;margin:0 auto">See Exactly How<br>The System <span class="chrome-h">Works</span></h2>
+      <p style="text-align:center;font-size:14px;color:rgba(255,255,255,.28);max-width:460px;margin:16px auto 0;line-height:1.7" class="reveal">From first contact to closed revenue — every step automated, every action intelligent.</p>
+    </div>
+    <div class="bos-flow">
+      <div class="bos-step" style="animation-delay:0s">
+        <div class="bos-step-left">
+          <div class="bos-step-event">Trigger</div>
+          <div class="bos-step-title">Lead Enters System</div>
+          <div class="bos-step-desc">Visitor interacts with website AI agent, WhatsApp, or form</div>
+        </div>
+        <div class="bos-step-mid"><div class="bos-node active">01</div></div>
+        <div class="bos-step-right">
+          <div class="bos-step-event">AI Processing</div>
+          <div class="bos-step-title">Intelligence Layer</div>
+          <div class="bos-step-desc">AI qualifies, scores, and categorizes the lead in real-time</div>
+        </div>
+      </div>
+      <div class="bos-step" style="animation-delay:.12s">
+        <div class="bos-step-left">
+          <div class="bos-step-event">Automation</div>
+          <div class="bos-step-title">CRM Receives Data</div>
+          <div class="bos-step-desc">Full lead profile synced to your CRM with all context attached</div>
+        </div>
+        <div class="bos-step-mid"><div class="bos-node">02</div></div>
+        <div class="bos-step-right">
+          <div class="bos-step-event">Engagement</div>
+          <div class="bos-step-title">Follow-up Triggered</div>
+          <div class="bos-step-desc">Personalized WhatsApp + email sequences fire automatically</div>
+        </div>
+      </div>
+      <div class="bos-step" style="animation-delay:.24s">
+        <div class="bos-step-left">
+          <div class="bos-step-event">Conversion</div>
+          <div class="bos-step-title">Appointment Booked</div>
+          <div class="bos-step-desc">AI schedules the call directly into your calendar, zero friction</div>
+        </div>
+        <div class="bos-step-mid"><div class="bos-node active">03</div></div>
+        <div class="bos-step-right">
+          <div class="bos-step-event">Revenue</div>
+          <div class="bos-step-title">Deal Closed</div>
+          <div class="bos-step-desc">You show up to a warm, qualified call — AI handled the rest</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ─────────────── PROCESS ─────────────── -->
+<section id="process">
+  <div class="section-inner">
+    <span class="section-label reveal">05 — How We Build</span>
+    <h2 class="section-h reveal">From Strategy to <span class="chrome-h">Deployment</span></h2>
+    <div class="process-track">
+      <div class="process-step reveal">
+        <div class="process-num">01</div>
+        <div class="process-step-title">Discovery</div>
+        <div class="process-step-desc">Deep audit of your business, revenue flows and automation opportunities.</div>
+      </div>
+      <div class="process-step reveal" style="animation-delay:.08s">
+        <div class="process-num">02</div>
+        <div class="process-step-title">Architecture</div>
+        <div class="process-step-desc">Custom AI agent design, automation flows, CRM integrations and data pipelines.</div>
+      </div>
+      <div class="process-step reveal" style="animation-delay:.16s">
+        <div class="process-num">03</div>
+        <div class="process-step-title">Engineering</div>
+        <div class="process-step-desc">Full-stack build using cutting-edge AI models, automation platforms and custom dev.</div>
+      </div>
+      <div class="process-step reveal" style="animation-delay:.24s">
+        <div class="process-num">04</div>
+        <div class="process-step-title">Integration</div>
+        <div class="process-step-desc">Seamless connection to your existing tools — CRM, calendar, WhatsApp, website.</div>
+      </div>
+      <div class="process-step reveal" style="animation-delay:.32s">
+        <div class="process-num">05</div>
+        <div class="process-step-title">Scale</div>
+        <div class="process-step-desc">Continuous optimization and expansion as your business intelligence grows.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ─────────────── AI DEMO ─────────────── -->
+<section id="ai-demo">
+  <div class="section-inner">
+    <div class="demo-layout">
+      <div class="demo-left">
+        <span class="section-label reveal">06 — Live AI Demo</span>
+        <h2 class="section-h reveal">Talk To Our <span class="blue-accent">AI</span></h2>
+        <p class="reveal">Experience a live TTFM AI agent right now. This is exactly the intelligence we deploy for our clients — ask it anything about our services, book a strategy session, or see how lead qualification works.</p>
+        <div class="demo-features">
+          <div class="demo-feat reveal"><div class="demo-feat-dot"></div>Real-time AI responses</div>
+          <div class="demo-feat reveal" style="animation-delay:.06s"><div class="demo-feat-dot"></div>Lead qualification built-in</div>
+          <div class="demo-feat reveal" style="animation-delay:.12s"><div class="demo-feat-dot"></div>Appointment booking capable</div>
+          <div class="demo-feat reveal" style="animation-delay:.18s"><div class="demo-feat-dot"></div>Knowledge base powered</div>
+        </div>
+        <button class="btn-blue reveal" onclick="document.getElementById('ai-demo').scrollIntoView()">Start Conversation</button>
+      </div>
+      <div class="reveal-fade">
+        <div class="chat-widget">
+          <div class="chat-header">
+            <div class="chat-avatar">AI</div>
+            <div>
+              <div class="chat-name">TTFM AI Agent</div>
+              <div class="chat-status-line"><div class="chat-online"></div>Online • Powered by TTFM Infrastructure</div>
+            </div>
+          </div>
+          <div class="chat-msgs" id="chat-msgs">
+            <div class="msg-ai">Hello! I'm the TTFM AI agent. I help businesses understand how AI infrastructure can transform their operations. What's your biggest business challenge right now?</div>
+          </div>
+          <div class="chat-input-row">
+            <input id="chat-input" type="text" placeholder="Ask about AI agents, automation, pricing..." onkeydown="if(event.key==='Enter')sendMsg()">
+            <button id="chat-send" onclick="sendMsg()">→</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ─────────────── DIGITAL VAULT ─────────────── -->
+<section id="vault">
+  <div class="section-inner">
+    <div class="vault-header">
+      <div>
+        <span class="section-label reveal">07 — Digital Vault</span>
+        <h2 class="section-h reveal">Systems We've <span class="chrome-h">Deployed</span></h2>
+      </div>
+      <p style="font-size:13px;color:rgba(255,255,255,.25);max-width:220px;text-align:right;line-height:1.7" class="reveal">Client work available under NDA. Capabilities showcased below.</p>
+    </div>
+    <div class="vault-grid">
+      <div class="vault-card reveal">
+        <div class="vault-card-bg" style="background:linear-gradient(135deg,#1a2a3a,#0a1520)"></div>
+        <div class="vault-card-grid"></div>
+        <canvas class="vault-card-canvas"></canvas>
+        <div class="vault-card-content">
+          <div class="vault-card-num">ARTIFACT 01</div>
+          <div class="vault-card-tag">AI Infrastructure</div>
+          <div class="vault-card-title">Real Estate AI System</div>
+          <div class="vault-card-sub">WhatsApp + Voice Agents • Lead Pipeline</div>
+        </div>
+      </div>
+      <div class="vault-card reveal" style="animation-delay:.08s">
+        <div class="vault-card-bg" style="background:linear-gradient(135deg,#2a1a1a,#150a0a)"></div>
+        <div class="vault-card-grid"></div>
+        <canvas class="vault-card-canvas"></canvas>
+        <div class="vault-card-content">
+          <div class="vault-card-num">ARTIFACT 02</div>
+          <div class="vault-card-tag">Automation</div>
+          <div class="vault-card-title">Healthcare Booking OS</div>
+          <div class="vault-card-sub">Appointment Automation • CRM Integration</div>
+        </div>
+      </div>
+      <div class="vault-card reveal" style="animation-delay:.16s">
+        <div class="vault-card-bg" style="background:linear-gradient(135deg,#1a2a1a,#0a150a)"></div>
+        <div class="vault-card-grid"></div>
+        <canvas class="vault-card-canvas"></canvas>
+        <div class="vault-card-content">
+          <div class="vault-card-num">ARTIFACT 03</div>
+          <div class="vault-card-tag">Custom Platform</div>
+          <div class="vault-card-title">E-Commerce Intelligence</div>
+          <div class="vault-card-sub">Custom AI Dashboard • Revenue Analytics</div>
+        </div>
+      </div>
+      <div class="vault-card reveal">
+        <div class="vault-card-bg" style="background:linear-gradient(135deg,#1a1a2a,#0a0a15)"></div>
+        <div class="vault-card-grid"></div>
+        <canvas class="vault-card-canvas"></canvas>
+        <div class="vault-card-content">
+          <div class="vault-card-num">ARTIFACT 04</div>
+          <div class="vault-card-tag">Media</div>
+          <div class="vault-card-title">Brand Film + Distribution</div>
+          <div class="vault-card-sub">Cinematic Production • AI Distribution</div>
+        </div>
+      </div>
+      <div class="vault-card reveal" style="animation-delay:.08s">
+        <div class="vault-card-bg" style="background:linear-gradient(135deg,#2a2a1a,#15150a)"></div>
+        <div class="vault-card-grid"></div>
+        <canvas class="vault-card-canvas"></canvas>
+        <div class="vault-card-content">
+          <div class="vault-card-num">ARTIFACT 05</div>
+          <div class="vault-card-tag">Voice AI</div>
+          <div class="vault-card-title">Outbound Voice Campaign</div>
+          <div class="vault-card-sub">1,000+ Calls/Day • Qualification AI</div>
+        </div>
+      </div>
+      <div class="vault-card reveal" style="animation-delay:.16s">
+        <div class="vault-card-bg" style="background:linear-gradient(135deg,#1a2a2a,#0a1515)"></div>
+        <div class="vault-card-grid"></div>
+        <canvas class="vault-card-canvas"></canvas>
+        <div class="vault-card-content">
+          <div class="vault-card-num">ARTIFACT 06</div>
+          <div class="vault-card-tag">Lead Generation</div>
+          <div class="vault-card-title">Finance Lead Engine</div>
+          <div class="vault-card-sub">Automated Pipeline • 5× Conversion</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ─────────────── CTA ─────────────── -->
+<section id="cta-section">
+  <canvas id="cta-canvas"></canvas>
+  <div class="cta-inner">
+    <div class="cta-eyebrow reveal">Ready To Build</div>
+    <h2 class="cta-title reveal">
+      <span class="cline1">The Future Is Built</span>
+      <span class="cline2">By Those Who Build Systems.</span>
+    </h2>
+    <p class="cta-sub reveal">Join forward-thinking businesses already running on TTFM intelligence.</p>
+    <div class="cta-actions reveal">
+      <button class="btn-primary" style="padding:17px 52px" onclick="openModal()">Start Building</button>
+      <button class="btn-blue" style="padding:17px 52px" onclick="document.getElementById('ai-demo').scrollIntoView({behavior:'smooth'})">Talk To AI First</button>
+    </div>
+    <div class="cta-note reveal">Mumbai, India &nbsp;•&nbsp; Global Delivery &nbsp;•&nbsp; Available Now</div>
+  </div>
+</section>
+
+<!-- ─────────────── FOOTER ─────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand">TTFM</div>
+        <div class="footer-tagline">The True Fame Media — Building intelligent systems for the future of business.</div>
+        <div class="footer-blue-line"></div>
+        <div class="footer-contact">hello@ttfm.in</div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Systems</h4>
+          <a href="#">Digital Employee</a>
+          <a href="#">WhatsApp AI</a>
+          <a href="#">Voice Agents</a>
+          <a href="#">Revenue Systems</a>
+          <a href="#">Business OS</a>
+        </div>
+        <div class="footer-col">
+          <h4>Media</h4>
+          <a href="#">Brand Films</a>
+          <a href="#">Commercial Production</a>
+          <a href="#">Content Systems</a>
+          <a href="#">Distribution</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="#">About TTFM</a>
+          <a href="#">Digital Vault</a>
+          <a href="#" onclick="openModal();return false">Strategy Session</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 The True Fame Media. All rights reserved.</div>
+      <div class="footer-loc">Mumbai, India</div>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div id="modal" style="display:none;position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.85);backdrop-filter:blur(20px);align-items:center;justify-content:center">
+  <div style="background:#0B0B0B;border:1px solid rgba(255,255,255,.08);max-width:500px;width:90%;padding:48px;position:relative">
+    <button onclick="closeModal()" style="position:absolute;top:20px;right:20px;background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;line-height:1">✕</button>
+    <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.5em;color:rgba(255,255,255,.25);margin-bottom:20px;text-transform:uppercase">Book Strategy Session</div>
+    <h3 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;margin-bottom:28px;line-height:1.2">Start Your AI<br>Infrastructure Journey</h3>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <input type="text" placeholder="Full Name" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#fff;padding:13px 16px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;width:100%">
+      <input type="email" placeholder="Business Email" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#fff;padding:13px 16px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;width:100%">
+      <input type="text" placeholder="Company / Business" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#fff;padding:13px 16px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;width:100%">
+      <select style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.5);padding:13px 16px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;width:100%;cursor:pointer">
+        <option value="">Primary Interest</option>
+        <option>AI Agents</option>
+        <option>Business Automation</option>
+        <option>Custom AI Platform</option>
+        <option>Media Production</option>
+        <option>Full Infrastructure</option>
+      </select>
+      <button class="btn-blue" style="width:100%;padding:15px;font-size:11px;margin-top:8px" onclick="closeModal();alert('Thank you! We\'ll contact you within 24 hours.')">Request Strategy Session →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── CURSOR ─── */
+const cur=document.getElementById('cur');
+const curRing=document.getElementById('cur-ring');
+const curTrail=document.getElementById('cur-trail');
+let mx=0,my=0,rx=0,ry=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=mx+'px';cur.style.top=my+'px';
+});
+(function ringLoop(){
+  rx+=(mx-rx)*.1;ry+=(my-ry)*.1;
+  tx+=(mx-tx)*.05;ty+=(my-ty)*.05;
+  curRing.style.left=rx+'px';curRing.style.top=ry+'px';
+  curTrail.style.left=tx+'px';curTrail.style.top=ty+'px';
+  requestAnimationFrame(ringLoop);
+})();
+document.querySelectorAll('button,a,.infra-card,.employee-row,.vault-card,.bos-step').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    curRing.style.width='60px';curRing.style.height='60px';
+    curRing.style.borderColor='rgba(126,231,255,.5)';
+    curTrail.style.opacity='1';
+  });
+  el.addEventListener('mouseleave',()=>{
+    curRing.style.width='38px';curRing.style.height='38px';
+    curRing.style.borderColor='rgba(255,255,255,.35)';
+    curTrail.style.opacity='0';
+  });
+});
+
+/* ─── MODAL ─── */
+function openModal(){
+  const m=document.getElementById('modal');
+  m.style.display='flex';
+  requestAnimationFrame(()=>m.style.opacity='1');
+}
+function closeModal(){
+  document.getElementById('modal').style.display='none';
+}
+
+/* ─── LOADER ─── */
+(function(){
+  const lc=document.getElementById('ldr-canvas');
+  const ctx=lc.getContext('2d');
+  let W,H,pts=[],frame=0,phase=0;
+  function resize(){W=lc.width=window.innerWidth;H=lc.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+
+  class Pt{
+    constructor(){
+      this.reset();
+      this.life=Math.random()*this.maxLife;
+    }
+    reset(){
+      this.x=W*.5+(Math.random()-.5)*W*.8;
+      this.y=H*.5+(Math.random()-.5)*H*.8;
+      this.vx=(Math.random()-.5)*.5;
+      this.vy=(Math.random()-.5)*.5;
+      this.life=0;this.maxLife=180+Math.random()*280;
+      this.size=Math.random()*1.8+.3;
+    }
+    update(){
+      this.life++;
+      if(phase>=2){
+        const dx=W/2-this.x,dy=H/2-this.y;
+        const d=Math.hypot(dx,dy);
+        if(d>30){this.vx+=dx/d*.025;this.vy+=dy/d*.025;}
+        this.vx*=.97;this.vy*=.97;
+      }
+      this.x+=this.vx;this.y+=this.vy;
+    }
+    get alpha(){return Math.sin(this.life/this.maxLife*Math.PI)*.65;}
+  }
+
+  for(let i=0;i<200;i++)pts.push(new Pt());
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    frame++;
+    if(frame%4===0&&pts.length<320&&phase<3)
+      pts.push(new Pt());
+
+    pts.forEach((p,i)=>{
+      p.update();
+      if(p.life>=p.maxLife){p.reset();return;}
+      ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${p.alpha})`;ctx.fill();
+      for(let j=i+1;j<pts.length;j++){
+        const q=pts[j];
+        const d=Math.hypot(p.x-q.x,p.y-q.y);
+        if(d<130){
+          ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
+          const a=(1-d/130)*p.alpha*.14;
+          ctx.strokeStyle=`rgba(126,231,255,${a})`;
+          ctx.lineWidth=.4;ctx.stroke();
+        }
+      }
+    });
+    requestAnimationFrame(draw);
+  }draw();
+
+  const logo=document.getElementById('ldr-logo');
+  const pBar=document.getElementById('ldr-prog');
+  const pct=document.getElementById('ldr-pct');
+  const tag=document.getElementById('ldr-tag');
+  let prog=0;
+  const labels=['INITIALIZING SYSTEMS','LOADING AI MODULES','BUILDING INFRASTRUCTURE','READY'];
+  const iv=setInterval(()=>{
+    prog+=Math.random()*2.5+1;
+    if(prog>=100){prog=100;clearInterval(iv);}
+    pBar.style.width=prog+'%';
+    pct.textContent=labels[Math.floor(prog/33)]||labels[3];
+  },70);
+
+  setTimeout(()=>phase=1,1000);
+  setTimeout(()=>phase=2,2200);
+  setTimeout(()=>{
+    logo.style.transition='opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)';
+    logo.style.opacity='1';logo.style.transform='scale(1) translateY(0)';
+  },2600);
+  setTimeout(()=>{
+    tag.style.transition='opacity .8s ease';tag.style.opacity='1';
+  },3400);
+  setTimeout(()=>{
+    const loader=document.getElementById('loader');
+    loader.style.transition='opacity .9s ease';
+    loader.style.opacity='0';
+    setTimeout(()=>{loader.style.display='none';initPage();},900);
+  },5200);
+})();
+
+/* ─── PAGE INIT ─── */
+function initPage(){
+  // Nav reveal
+  const nav=document.getElementById('nav');
+  nav.style.transition='opacity .7s ease,transform .7s cubic-bezier(.16,1,.3,1)';
+  nav.style.opacity='1';nav.style.transform='translateY(0)';
+
+  // Nav scroll
+  window.addEventListener('scroll',()=>{
+    if(window.scrollY>60)nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  });
+
+  // Hero stagger
+  const items=[
+    ['.hero-eyebrow',100,'opacity .7s ease'],
+    ['.hero-title',300,'opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)'],
+    ['.hero-sub',620,'opacity .7s ease'],
+    ['.hero-actions',850,'opacity .7s ease'],
+    ['#scroll-ind',1100,'opacity .7s ease'],
+  ];
+  items.forEach(([sel,delay,trans])=>{
+    setTimeout(()=>{
+      const el=document.querySelector(sel);
+      if(!el)return;
+      el.style.transition=trans;
+      el.style.opacity='1';
+      el.style.transform='translateY(0)';
+    },delay);
+  });
+
+  initHero();
+  initNeural();
+  initCtaCanvas();
+  initCardNeurals();
+  initReveal();
+}
+
+/* ─── HERO THREE.JS ─── */
+function initHero(){
+  const canvas=document.getElementById('hero-canvas');
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(55,canvas.offsetWidth/canvas.offsetHeight,.1,1000);
+  camera.position.z=6;
+
+  function resize(){
+    renderer.setSize(canvas.offsetWidth,canvas.offsetHeight,false);
+    camera.aspect=canvas.offsetWidth/canvas.offsetHeight;
+    camera.updateProjectionMatrix();
+  }
+  resize();window.addEventListener('resize',resize);
+
+  // Ambient light
+  const aLight=new THREE.AmbientLight(0xffffff,.2);
+  scene.add(aLight);
+  const dLight=new THREE.DirectionalLight(0x7EE7FF,.4);
+  dLight.position.set(5,5,5);scene.add(dLight);
+  const dLight2=new THREE.DirectionalLight(0xffffff,.6);
+  dLight2.position.set(-5,-2,3);scene.add(dLight2);
+
+  // Central chrome icosahedron (monolith-like)
+  const icoGeo=new THREE.IcosahedronGeometry(1.2,1);
+  const icoMat=new THREE.MeshStandardMaterial({
+    color:0x888888,
+    metalness:.95,roughness:.08,
+    envMapIntensity:1,
+    transparent:true,opacity:.85
+  });
+  const ico=new THREE.Mesh(icoGeo,icoMat);
+  scene.add(ico);
+
+  // Wireframe overlay
+  const wireGeo=new THREE.IcosahedronGeometry(1.22,1);
+  const wireMat=new THREE.MeshBasicMaterial({color:0xaabbcc,wireframe:true,transparent:true,opacity:.04});
+  const wire=new THREE.Mesh(wireGeo,wireMat);
+  scene.add(wire);
+
+  // Ring orbits
+  function makeRing(r,tube,rx,ry,col,op){
+    const g=new THREE.TorusGeometry(r,tube,8,120);
+    const m=new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:op});
+    const t=new THREE.Mesh(g,m);
+    t.rotation.x=rx;t.rotation.y=ry;
+    scene.add(t);return t;
+  }
+  const ring1=makeRing(2,.0015,Math.PI/2,.2,0x7EE7FF,.2);
+  const ring2=makeRing(2.6,.0012,Math.PI/3,.6,0xffffff,.08);
+  const ring3=makeRing(3.2,.001,Math.PI/5,1,0xB8BCC4,.05);
+
+  // Particles orbiting
+  const pCount=800;
+  const pPos=new Float32Array(pCount*3);
+  const pPhase=[];
+  for(let i=0;i<pCount;i++){
+    const theta=Math.random()*Math.PI*2;
+    const phi=Math.random()*Math.PI;
+    const r=2+Math.random()*3.5;
+    pPos[i*3]=r*Math.sin(phi)*Math.cos(theta);
+    pPos[i*3+1]=r*Math.sin(phi)*Math.sin(theta);
+    pPos[i*3+2]=r*Math.cos(phi);
+    pPhase.push(Math.random()*Math.PI*2);
+  }
+  const pGeo=new THREE.BufferGeometry();
+  pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
+  const pMat=new THREE.PointsMaterial({color:0xaaccdd,size:.02,transparent:true,opacity:.5,sizeAttenuation:true});
+  const pts=new THREE.Points(pGeo,pMat);
+  scene.add(pts);
+
+  let mouseX=0,mouseY=0,targetX=0,targetY=0;
+  document.addEventListener('mousemove',e=>{
+    mouseX=(e.clientX/window.innerWidth-.5)*2;
+    mouseY=(e.clientY/window.innerHeight-.5)*2;
+  });
+
+  let t=0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t+=.004;
+    targetX+=(mouseX-targetX)*.06;
+    targetY+=(mouseY-targetY)*.06;
+
+    ico.rotation.y=t*.18+targetX*.4;
+    ico.rotation.x=t*.06+targetY*.2;
+    wire.rotation.y=ico.rotation.y;
+    wire.rotation.x=ico.rotation.x;
+
+    // Floating effect
+    ico.position.y=Math.sin(t*.5)*.08;
+    wire.position.y=ico.position.y;
+
+    ring1.rotation.z=t*.2;
+    ring2.rotation.x+=.003;
+    ring3.rotation.y+=.0015;
+
+    pts.rotation.y=t*.04+targetX*.1;
+    pts.rotation.x=targetY*.05;
+    camera.position.x=targetX*.4;
+    camera.position.y=-targetY*.3;
+    camera.lookAt(scene.position);
+
+    renderer.render(scene,camera);
+  }animate();
+}
+
+/* ─── NEURAL CANVAS ─── */
+function initNeural(){
+  const canvas=document.getElementById('neural-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H,nodes=[];
+
+  function resize(){
+    W=canvas.width=canvas.offsetWidth;
+    H=canvas.height=canvas.offsetHeight;
+  }
+  resize();
+  const ro=new ResizeObserver(resize);
+  ro.observe(canvas.parentElement);
+
+  function makeNodes(){
+    nodes=[];
+    const count=Math.min(22,Math.floor(W*H/12000));
+    for(let i=0;i<count;i++){
+      nodes.push({
+        x:W*.1+Math.random()*W*.8,
+        y:H*.1+Math.random()*H*.8,
+        vx:(Math.random()-.5)*.3,
+        vy:(Math.random()-.5)*.3,
+        r:Math.random()*2+1,
+        phase:Math.random()*Math.PI*2
+      });
+    }
+  }
+  makeNodes();
+
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    t+=.012;
+    nodes.forEach(n=>{
+      n.x+=n.vx;n.y+=n.vy;
+      if(n.x<0||n.x>W)n.vx*=-1;
+      if(n.y<0||n.y>H)n.vy*=-1;
+    });
+    nodes.forEach((a,i)=>{
+      nodes.slice(i+1).forEach(b=>{
+        const d=Math.hypot(a.x-b.x,a.y-b.y);
+        const maxD=Math.min(W,H)*.45;
+        if(d<maxD){
+          const alpha=(1-d/maxD)*.12;
+          // animated dash
+          ctx.beginPath();
+          ctx.setLineDash([4,8]);
+          ctx.lineDashOffset=-t*12;
+          ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+          ctx.strokeStyle=`rgba(126,231,255,${alpha})`;
+          ctx.lineWidth=.6;ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      });
+      const pulse=.5+.5*Math.sin(t*2+a.phase);
+      ctx.beginPath();ctx.arc(a.x,a.y,a.r*(.8+.4*pulse),0,Math.PI*2);
+      ctx.fillStyle=`rgba(126,231,255,${.3*pulse+.1})`;ctx.fill();
+      // glow ring
+      ctx.beginPath();ctx.arc(a.x,a.y,a.r*3*pulse,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(126,231,255,${.06*pulse})`;
+      ctx.lineWidth=1;ctx.stroke();
+    });
+    requestAnimationFrame(draw);
+  }draw();
+}
+
+/* ─── CARD NEURAL MINIATURES ─── */
+function initCardNeurals(){
+  document.querySelectorAll('.infra-card-neural[data-neural]').forEach(canvas=>{
+    const ctx=canvas.getContext('2d');
+    const card=canvas.closest('.infra-card');
+    let active=false;
+    card.addEventListener('mouseenter',()=>active=true);
+    card.addEventListener('mouseleave',()=>active=false);
+    const nodes=[];
+    for(let i=0;i<8;i++)nodes.push({x:Math.random()*200,y:Math.random()*80,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.2});
+    function draw(){
+      requestAnimationFrame(draw);
+      const W=card.offsetWidth,H=80;
+      if(canvas.width!==W||canvas.height!==H){canvas.width=W;canvas.height=H;}
+      ctx.clearRect(0,0,W,H);
+      if(!active)return;
+      nodes.forEach(n=>{n.x+=n.vx;n.y+=n.vy;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1;});
+      nodes.forEach((a,i)=>{
+        nodes.slice(i+1).forEach(b=>{
+          const d=Math.hypot(a.x-b.x,a.y-b.y);
+          if(d<80){
+            ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+            ctx.strokeStyle=`rgba(126,231,255,${(1-d/80)*.15})`;
+            ctx.lineWidth=.5;ctx.stroke();
+          }
+        });
+        ctx.beginPath();ctx.arc(a.x,a.y,1.5,0,Math.PI*2);
+        ctx.fillStyle='rgba(126,231,255,0.3)';ctx.fill();
+      });
+    }draw();
+  });
+}
+
+/* ─── CTA CANVAS ─── */
+function initCtaCanvas(){
+  const canvas=document.getElementById('cta-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){W=canvas.width=canvas.offsetWidth;H=canvas.height=canvas.offsetHeight;}
+  resize();window.addEventListener('resize',resize);
+  const pts=[];
+  for(let i=0;i<50;i++)pts.push({x:Math.random()*1800,y:Math.random()*700,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>W)p.vx*=-1;
+      if(p.y<0||p.y>H)p.vy*=-1;
+      ctx.beginPath();ctx.arc(p.x,p.y,1.2,0,Math.PI*2);
+      ctx.fillStyle='rgba(126,231,255,0.2)';ctx.fill();
+    });
+    pts.forEach((p,i)=>{
+      pts.slice(i+1).forEach(q=>{
+        const d=Math.hypot(p.x-q.x,p.y-q.y);
+        if(d<160){
+          ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
+          ctx.strokeStyle=`rgba(126,231,255,${(1-d/160)*.05})`;
+          ctx.lineWidth=.4;ctx.stroke();
+        }
+      });
+    });
+    requestAnimationFrame(draw);
+  }draw();
+}
+
+/* ─── REVEAL OBSERVER ─── */
+function initReveal(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('visible');
+        obs.unobserve(e.target);
+      }
+    });
+  },{threshold:.08,rootMargin:'0px 0px -32px 0px'});
+  document.querySelectorAll('.reveal,.reveal-fade,.bos-step').forEach(el=>obs.observe(el));
+}
+
+/* ─── AI CHAT ─── */
+const responses={
+  default:[
+    "Great question! TTFM specializes in deploying AI agents and automation systems that run 24/7. Our most popular system is the Digital Employee — an AI agent that handles your website leads, WhatsApp messages and voice calls autonomously. Would you like to book a strategy session to see how this applies to your business?",
+    "That's exactly the kind of challenge our Business Operating System is designed to solve. We automate the full lead-to-revenue pipeline — from first contact through appointment booking. Most clients see significant results within the first 30 days. Want me to connect you with our team?",
+    "We've deployed AI infrastructure for businesses across real estate, healthcare, finance and e-commerce. Each system is custom-built — not templates. The best next step is a 30-minute strategy session where we map out your specific automation opportunities. Would you like to book one?"
+  ],
+  pricing:["Our systems are custom-scoped based on your business size and requirements. Most projects start from ₹50,000/month for a single AI agent system, scaling up for full Business OS deployments. A strategy session helps us give you an accurate proposal — shall I arrange one?"],
+  agent:["Our AI agents are powered by the latest LLMs, fine-tuned on your business knowledge. They handle real conversations — not scripted bots. Website agents, WhatsApp agents, and voice agents can all be deployed simultaneously, creating a unified intelligent front-line for your business."],
+  whatsapp:["Our WhatsApp AI system handles inbound leads, sends personalized follow-up sequences, books appointments and answers complex queries — all automatically. Most clients automate 80%+ of their WhatsApp workload within the first week of deployment."],
+  automation:["Business automation at TTFM means connecting every part of your operations — CRM, calendar, communication, reporting — into one intelligent system. When a lead comes in, everything that follows is automated: qualification, follow-up, booking, onboarding. Zero manual work."],
+};
+let msgCount=0;
+function getBotResponse(msg){
+  const l=msg.toLowerCase();
+  if(l.includes('price')||l.includes('cost')||l.includes('₹')||l.includes('rs')||l.includes('rupee'))return responses.pricing[0];
+  if(l.includes('agent')||l.includes('website')||l.includes('chatbot'))return responses.agent[0];
+  if(l.includes('whatsapp'))return responses.whatsapp[0];
+  if(l.includes('automat')||l.includes('crm')||l.includes('workflow'))return responses.automation[0];
+  return responses.default[msgCount%3];
+}
+function sendMsg(){
+  const inp=document.getElementById('chat-input');
+  const msgs=document.getElementById('chat-msgs');
+  const text=inp.value.trim();
+  if(!text)return;
+  inp.value='';
+  const userMsg=document.createElement('div');
+  userMsg.className='msg-user';userMsg.textContent=text;
+  msgs.appendChild(userMsg);
+  const typing=document.createElement('div');
+  typing.className='msg-ai msg-typing';
+  typing.innerHTML='<span></span><span></span><span></span>';
+  msgs.appendChild(typing);
+  msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    typing.remove();
+    const aiMsg=document.createElement('div');
+    aiMsg.className='msg-ai';aiMsg.textContent=getBotResponse(text);
+    msgs.appendChild(aiMsg);
+    msgs.scrollTop=msgs.scrollHeight;
+    msgCount++;
+  },1200+Math.random()*800);
+}
+</script>
+</body>
+</html>
